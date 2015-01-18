@@ -1,0 +1,9 @@
+{
+  "name": "orgChart",
+  "description": "NYC org Chart",
+  "version": "1.0.0",
+  "dependencies": {
+    "mongoose": "latest",
+    "express": "latest"
+  }
+}

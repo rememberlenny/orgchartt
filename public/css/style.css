@@ -1,0 +1,18 @@
+body {
+  padding:0;
+  font-family: 'Raleway', sans-serif;
+}
+
+rect {
+	fill: rgba(0, 0, 0, 0);
+	stroke: #898181;
+	stroke-width: 3;
+}
+
+#saveButton {
+	position:fixed;
+}
+
+.name {
+	font-size:12px;
+}
