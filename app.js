@@ -23,20 +23,12 @@ var server = app.listen(4000, function () {
 
 })
 
-app.get('/nyc', function (req, res) {
-  return BoxModel.find(function (err,boxes) {
-    if (!err) {
-      return res.send(boxes);
-    } else {
-      return console.log(err);
-    }
-  });
-})
-
-app.post('/box',function (req, res) {
+//CREATE
+app.post('/nyc/api/boxes/',function (req, res) {
   console.log(req.body);
   var thisBox = req.body;
-  BoxModel.update({_id: thisBox._id}, thisBox, {upsert: true}, function(err) {
+  console.log(thisBox);
+  BoxModel.create(thisBox, function(err) {
     if (err) {
         res.status(500).json({});
         return;
@@ -46,10 +38,52 @@ app.post('/box',function (req, res) {
   });
 });
 
+//READ
+app.get('/nyc/api/boxes', function (req, res) {
+  return BoxModel.find(function (err,boxes) {
+    if (!err) {
+      return res.send(boxes);
+    } else {
+      return console.log(err);
+    }
+  });
+})
+
+
+//UPDATE
+app.post('/nyc/api/boxes/:id',function (req, res) {
+  console.log(req.body);
+  var thisBox = req.body;
+  BoxModel.update({_id: thisBox._id}, thisBox, function(err) {
+    if (err) {
+        res.status(500).json({});
+        return;
+    }
+
+    res.status(204).json({});
+  });
+});
+
+//DELETE
+app.delete('/nyc/api/boxes/:id',function (req, res) {
+  
+  BoxModel.remove({_id: req.params.id}, function(err) {
+    if (err) {
+        res.status(500).json({});
+        return;
+    }
+
+    res.status(204).json({});
+  });
+})
+
+
 var Schema = mongoose.Schema;  
 
 var Box = new Schema({  
     title: { type: String, required: true }, 
+    name: { type: String, required: true },
+    thumbnail: { type: String, required: true },
     x: { type: Number, required: true},
     y: { type: Number, required: true}
 });
