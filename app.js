@@ -1,6 +1,7 @@
 var express = require('express'),
 	mongoose = require('mongoose'),
-  bodyParser = require('body-parser');
+  bodyParser = require('body-parser'),
+  fs = require('fs');
 
 var app = express()
 
@@ -77,6 +78,15 @@ app.delete('/nyc/api/boxes/:id',function (req, res) {
   });
 })
 
+//create image
+app.post('/nyc/api/images',function (req, res) {
+  var image = decodeURIComponent(req.body.img);
+  var imageBuffer = decodeBase64Image(image);
+  var timestamp = new Date().getTime().toString();
+  fs.writeFile('public/img/' + timestamp + '.png', imageBuffer.data, function(err) {
+    res.status(201).json({'name':timestamp + '.png'})
+  });
+});
 
 var Schema = mongoose.Schema;  
 
@@ -90,3 +100,17 @@ var Box = new Schema({
 
 var BoxModel = mongoose.model('Box', Box); 
 
+//image POST processing from http://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
+function decodeBase64Image(dataString) {
+  var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+    response = {};
+
+  if (matches.length !== 3) {
+    return new Error('Invalid input string');
+  }
+
+  response.type = matches[1];
+  response.data = new Buffer(matches[2], 'base64');
+
+  return response;
+}

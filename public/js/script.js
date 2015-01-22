@@ -20,6 +20,7 @@ $(document).ready(function() {
     .origin(Object)
     .on("drag", dragmove)
     .on("dragend",function(d){
+      console.log("dragend");
       var translation = d3.select(this).attr("transform").split('(')[1].split(')')[0].split(',');
      
       if (d.x != parseInt(translation[0])) {
@@ -37,7 +38,7 @@ $(document).ready(function() {
     });
 
     function dragmove(d) {
-      //console.log(this);
+      console.log("dragmove");
       var x = d3.event.x;
       var y = d3.event.y;
       d3.select(this).attr("transform",function(d){ return "translate(" + x + "," + y + ")";});
@@ -53,7 +54,6 @@ $(document).ready(function() {
       .attr("class","box")
       .on("click",function(d){
         
-        console.log("click");
         var scope = angular.element(document.getElementById("form")).scope();
         scope.$apply(function () {
           scope.box = d;
@@ -115,12 +115,16 @@ $(document).ready(function() {
       updateBoxes();
     });
 
+
+
+
   });
   
 
 
-
-  //$('svg').svgPan('viewport');
+  var enablePan = false;
+  var enableDrag = true;
+  $('svg').svgPan('viewport', enablePan, enableDrag);
 });
 
 function boxController($scope) {
@@ -149,6 +153,52 @@ function boxController($scope) {
       //data: JSON.stringify($scope.box)
     })
   };
+
+$('#imageButton').click(function(){
+  $('#imagePop').show();
+});
+
+
+//cropbox.js 
+var options =
+        {
+            thumbBox: '.thumbBox',
+            spinner: '.spinner',
+            imgSrc: '../img/deblasio.jpg'
+        }
+        var cropper = $('.imageBox').cropbox(options);
+        $('#file').on('change', function(){
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                options.imgSrc = e.target.result;
+                cropper = $('.imageBox').cropbox(options);
+            }
+            reader.readAsDataURL(this.files[0]);
+            this.files = [];
+        })
+        $('#btnCrop').on('click', function(){
+            var img = cropper.getDataURL();
+
+            $.ajax({
+              type: "POST",
+              url: "/nyc/api/images",
+              data: {img: encodeURIComponent(img)},
+              contentType: "application/x-www-form-urlencoded;charset=UTF-8",
+              success: function(res){
+                  $('#imagePop').hide();
+                  $('#thumbnailInput').text(res.name);
+              }
+            });
+            // '/data:image\/.*;base64,/'
+
+            $('.cropped').append('<img src="'+img+'">');
+        })
+        $('#btnZoomIn').on('click', function(){
+            cropper.zoomIn();
+        })
+        $('#btnZoomOut').on('click', function(){
+            cropper.zoomOut();
+        })
 
 
 }

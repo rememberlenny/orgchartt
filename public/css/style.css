@@ -31,3 +31,80 @@ rect {
 	padding: 20px;
 	min-height: 500px;
 }
+
+#cropContainerHeader {
+			width: 200px;
+			height: 150px;
+			position:relative; /* or fixed or absolute */
+}
+
+
+#imagePop {
+	top: 20px;
+	right: 20px;
+	left: 20px;
+	bottom: 20px;
+	position: fixed;
+	z-index: 9999;
+	background: #583333;
+	min-height: 300px;
+	border-radius: 16px;
+	padding: 35px;
+	display:none;
+}
+
+.container
+{
+	position: absolute;
+	top: 10%; left: 10%; right: 0; bottom: 0;
+}
+.action
+{
+    width: 200px;
+    height: 30px;
+    margin: 10px 0;
+}
+.cropped>img
+{
+    margin-right: 10px;
+}
+
+.imageBox
+{
+    position: relative;
+    height: 300px;
+    width: 300px;
+    border:1px solid #aaa;
+    background: #fff;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    cursor:move;
+}
+
+.imageBox .thumbBox
+{
+    position: absolute;
+    top: 57%;
+    left: 57%;
+    width: 160px;
+    height: 160px;
+    margin-top: -100px;
+    margin-left: -100px;
+    box-sizing: border-box;
+    border: 1px solid rgb(102, 102, 102);
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
+    background: none repeat scroll 0% 0% transparent;
+}
+
+.imageBox .spinner
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+    line-height: 400px;
+    background: rgba(0,0,0,0.7);
+}
+		
