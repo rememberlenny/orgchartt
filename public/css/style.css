@@ -22,6 +22,10 @@ rect {
 	font-size:12px;
 }
 
+.title {
+	font-weight:600;
+}
+
 #sidebar {
 	position: fixed;
 	right: 0;

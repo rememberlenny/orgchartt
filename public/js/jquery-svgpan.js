@@ -277,6 +277,7 @@
                  * Handle click event.
                  */
                 handleMouseDown = function (evt) {
+                    console.log(evt);
                     if (evt.preventDefault) {
                         evt.preventDefault();
                     }
@@ -289,7 +290,7 @@
                     var g = svgRoot;
 
                     // Pan anyway when drag is disabled and the user clicked on an element
-                    if (evt.target.tagName === "svg" || !enableDrag) {
+                    if (evt.target.tagName === "svg") {
                         // Pan mode
                         state = PAN;
 
@@ -297,6 +298,7 @@
 
                         stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
                     } else {
+
                         // Drag mode
                         state = DRAG;
 
@@ -306,6 +308,7 @@
 
                         stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
                     }
+
                 },
 
                 /**

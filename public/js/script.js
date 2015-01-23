@@ -3,7 +3,13 @@ $(document).ready(function() {
   var svg = d3.select("body")
   .append("svg")
   .attr("width", 5500)
-  .attr("height", 3800);
+  .attr("height", 3800)
+  .call(function() {
+    var bgDrag = d3.behavior.drag()
+    .on("drag", function() {
+      console.log('drag');
+    })
+  });
 
   var group = svg.append("g")
     .attr("id","viewport");
@@ -99,6 +105,28 @@ $(document).ready(function() {
         .attr("height",function(d){ return 60; })
         .attr("rx",rectangleRadius)
         .attr("ry",rectangleRadius);
+
+      boxes.append("rect") //Outer rect for agency
+        .attr("width",function(d){ return 300; })
+        .attr("height",function(d){ return 95; })
+        .attr("y",-35)
+        .attr("rx",rectangleRadius)
+        .attr("ry",rectangleRadius)
+        .attr("style", function(d){
+          if(d.chiefOf) {
+            return 'stroke-width:3';
+          } else {
+            return 'stroke-width:0';
+          }
+        });
+
+      boxes.append("text")
+        .text(function(d){
+          return d.chiefOf;
+        })
+        .attr("class","title")
+        .attr("x",10)
+        .attr("y",-11);
     }
     updateBoxes();
 
@@ -122,7 +150,7 @@ $(document).ready(function() {
   
 
 
-  var enablePan = false;
+  var enablePan = true;
   var enableDrag = true;
   $('svg').svgPan('viewport', enablePan, enableDrag);
 });
@@ -134,6 +162,12 @@ function boxController($scope) {
     console.log("update");
     if($scope.box._id){ //if the box exists, update
       console.log("there's already an id");
+      $.ajax({
+          url: '/nyc/api/boxes/' + $scope.box._id, 
+          type: 'POST', 
+          contentType: 'application/json', 
+          data: JSON.stringify($scope.box)
+        })
     } else { //if it's new, create
       console.log($scope.box);
       $.ajax({
@@ -164,7 +198,7 @@ var options =
         {
             thumbBox: '.thumbBox',
             spinner: '.spinner',
-            imgSrc: '../img/deblasio.jpg'
+            imgSrc: ''
         }
         var cropper = $('.imageBox').cropbox(options);
         $('#file').on('change', function(){
@@ -186,7 +220,12 @@ var options =
               contentType: "application/x-www-form-urlencoded;charset=UTF-8",
               success: function(res){
                   $('#imagePop').hide();
-                  $('#thumbnailInput').text(res.name);
+                  //$('#thumbnailInput').val(res.name);
+                  
+                  var scope = angular.element($('#form')).scope();
+                  scope.$apply(function(){
+                    scope.box.thumbnail = res.name;
+                  });
               }
             });
             // '/data:image\/.*;base64,/'
