@@ -5,7 +5,7 @@ var express = require('express'),
 
 var app = express()
 
-mongoose.connect('mongodb://localhost/orgChart');
+mongoose.connect('mongodb://admin:WoofyDog54@ds031571.mongolab.com:31571/heroku_app33449780');
 
 
 app.use(express.static(__dirname + '/public'));
