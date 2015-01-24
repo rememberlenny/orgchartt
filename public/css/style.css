@@ -28,13 +28,14 @@ rect {
 }
 
 #sidebar {
-	position: fixed;
-	right: 0;
-	background: #cccccc;
-	width: 300px;
-	top: 0;
-	padding: 20px;
-	min-height: 500px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: #cccccc;
+    width: 300px;
+    padding: 20px;
+    margin-top:50px;
 }
 
 #cropContainerHeader {
@@ -116,5 +117,6 @@ rect {
 .container-fluid {
     padding:0;
     margin: 50px auto 0 auto;
+    height:calc(100vh - 50px)
 }
 		

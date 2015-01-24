@@ -1,9 +1,11 @@
 $(document).ready(function() {
 
+
+
   var svg = d3.select(".container-fluid")
     .append("svg")
-    .attr("width", 5500)
-    .attr("height", 3800)
+    .attr("width", '100%')
+    .attr("height", '100%')
     .call(function() {
       var bgDrag = d3.behavior.drag()
         .on("drag", function() {
