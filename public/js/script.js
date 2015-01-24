@@ -1,6 +1,31 @@
+var editMode = false,
+  viewData,
+  boxData,
+  updateBoxes;
+
+function updateMatrix() { //store the latest viewport transform after drag or zoom
+
+  var lastTransform = $('#viewport').attr('transform');
+  viewData.translation = lastTransform;
+  console.log(viewData);
+}
+
 $(document).ready(function() {
 
 
+
+  // $('#editButton').click(function(){
+  //   editMode = true;
+  //   var scope = angular.element(document.getElementById("viewController")).scope();
+  //   scope.$apply(function() {
+  //     scope.editMode = true;
+  //   });
+  // });
+
+
+  $.getJSON('nyc/api/view',function(res){
+  
+  viewData = res;
 
   var svg = d3.select(".container-fluid")
     .append("svg")
@@ -13,68 +38,84 @@ $(document).ready(function() {
         })
     });
 
+
+
   var group = svg.append("g")
-    .attr("id", "viewport");
+    .attr("id", "viewport")
+    .attr("transform",viewData.translation);
 
   var rectangleRadius = 5;
 
 
-
-
+  //listen for save, push view to server
+  $('.saveButton').click(function(){
+    console.log(viewData);
+    $.ajax({
+      url: '/nyc/api/view/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(viewData)
+    })
+  });
 
   d3.json('/nyc/api/boxes', function(data) {
 
-    var drag = d3.behavior.drag()
-      .origin(Object)
-      .on("drag", dragmove)
-      .on("dragend", function(d) {
-   
-        //get the translation post-drag  
-        var translation = d3.select(this).attr("transform").split('(')[
-          1].split(')')[0].split(',');
+      boxData=data;
 
-        //let's add some snap-to logic here
-        //25 pixel grid - calculate the nearest multiple of 25 on x and y  and animate the box to it
-        console.log(translation);
-        //var next = Math.ceil(n/12) * 12;
+      var drag = d3.behavior.drag()
+        .origin(Object)
+        .on("drag", dragmove)
+        .on("dragend", function(d) {
+     
+          //get the translation post-drag  
+          var translation = d3.select(this).attr("transform").split('(')[
+            1].split(')')[0].split(',');
 
-        translation[0] = (Math.round(translation[0]/25) * 25);
-        translation[1] = (Math.round(translation[1]/25) * 25);
+          //let's add some snap-to logic here
+          //25 pixel grid - calculate the nearest multiple of 25 on x and y  and animate the box to it
+          console.log(translation);
+          //var next = Math.ceil(n/12) * 12;
 
-        d3.select(this)
-          .transition()
-            .duration(100)
-            .attr("transform","translate(" + translation[0] + "," + translation[1] + ")");
+          translation[0] = (Math.round(translation[0]/25) * 25);
+          translation[1] = (Math.round(translation[1]/25) * 25);
 
-        //if the box has moved, update the associated data
-        if (d.x != parseInt(translation[0])) {
-          d.x = translation[0];
-          d.y = translation[1];
+          d3.select(this)
+            .transition()
+              .duration(100)
+              .attr("transform","translate(" + translation[0] + "," + translation[1] + ")");
 
-          //POST the changes to the server
-          $.ajax({
-            url: '/nyc/api/boxes/' + d._id,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(d)
-          })
-        }
+          //if the box has moved, update the associated data
+          if (d.x != parseInt(translation[0])) {
+            d.x = translation[0];
+            d.y = translation[1];
 
-      });
+            //POST the changes to the server
+            $.ajax({
+              url: '/nyc/api/boxes/' + d._id,
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(d)
+            })
+          }
+
+        });
+      
 
     function dragmove(d) {
-      console.log("dragmove");
-      var x = d3.event.x;
-      var y = d3.event.y;
-      d3.select(this).attr("transform", function(d) {
-        return "translate(" + x + "," + y + ")";
-      });
+      if(editMode) {
+        var x = d3.event.x;
+        var y = d3.event.y;
+        d3.select(this).attr("transform", function(d) {
+          return "translate(" + x + "," + y + ")";
+        });
+      }
     }
 
 
-    function updateBoxes() {
+
+    updateBoxes = function(){
       var boxes = group.selectAll("g")
-        .data(data)
+        .data(boxData)
         .enter()
         .append('g')
         .attr("transform", function(d) {
@@ -162,18 +203,7 @@ $(document).ready(function() {
     }
     updateBoxes();
 
-    $('#newButton').click(function() {
-      var emptyBox = {
-        "x": 10,
-        "y": 10,
-        "title": "Title",
-        "name": "Name",
-        "thumbnail": "noimagethumb.png"
-      }
 
-      data.push(emptyBox);
-      updateBoxes();
-    });
 
 
 
@@ -185,9 +215,39 @@ $(document).ready(function() {
   var enablePan = true;
   var enableDrag = true;
   $('svg').svgPan('viewport', enablePan, enableDrag);
+       
+  })
+
+
 });
 
-function boxController($scope) {
+//Load angular controllers outside of document.ready();
+
+var viewController = function($scope) {
+  $scope.editMode = false;
+
+  //set global editMode based on angular editMode
+  $scope.$watch('editMode', function() {
+    $scope.editMode ? editMode = true : editMode = false;
+    console.log(editMode);
+  });
+
+  $scope.newBox = function(){
+    console.log("NewBox!");
+    var emptyBox = {
+        "x": 10,
+        "y": 10,
+        "title": "Title",
+        "name": "Name",
+        "thumbnail": "noimagethumb.png"
+      }
+
+      boxData.push(emptyBox);
+      updateBoxes();
+  };
+}
+
+var boxController = function($scope) {
   $scope.name = "hello";
 
   $scope.update = function() {
@@ -271,6 +331,9 @@ function boxController($scope) {
   $('#btnZoomOut').on('click', function() {
     cropper.zoomOut();
   })
+
+
+
 
 
 }

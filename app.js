@@ -91,6 +91,32 @@ app.post('/nyc/api/images',function (req, res) {
   });
 });
 
+//read view 
+app.get('/nyc/api/view',function (req,res) {
+  return ViewModel.findOne(function (err,view) {
+    if (!err) {
+      return res.send(view);
+    } else {
+      return console.log(err);
+    }
+  });
+});
+
+//update view
+app.post('/nyc/api/view/',function (req, res) {
+  console.log("viewPOST");
+  var thisView = req.body;
+  console.log(thisView);
+  ViewModel.update({name: thisView.name}, thisView, function(err) {
+    if (err) {
+        res.status(500).json({});
+        return;
+    }
+
+    res.status(204).json({});
+  });
+});
+
 var Schema = mongoose.Schema;  
 
 var Box = new Schema({  
@@ -103,6 +129,14 @@ var Box = new Schema({
 });
 
 var BoxModel = mongoose.model('Box', Box); 
+
+var View = new Schema({
+  name: { type: String, required: true },
+  translation: { type: String, required: true }
+});
+
+var ViewModel = mongoose.model('View', View); 
+
 
 //image POST processing from http://stackoverflow.com/questions/20267939/nodejs-write-base64-image-file
 function decodeBase64Image(dataString) {

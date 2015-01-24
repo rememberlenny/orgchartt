@@ -108,6 +108,9 @@
 
 /*global define, jQuery, window*/
 
+
+
+
 (function (factory) {
     "use strict";
     if (typeof define === 'function' && define.amd) {
@@ -183,6 +186,8 @@
                  * Handle mouse wheel event.
                  */
                 handleMouseWheel = function (evt) {
+
+
                     if (!enableZoom) {
                         return;
                     }
@@ -216,6 +221,8 @@
                     }
 
                     stateTf = stateTf.multiply(k.inverse());
+
+                    updateMatrix();
                 },
 
                 /**
@@ -277,7 +284,6 @@
                  * Handle click event.
                  */
                 handleMouseDown = function (evt) {
-                    console.log(evt);
                     if (evt.preventDefault) {
                         evt.preventDefault();
                     }
@@ -315,6 +321,9 @@
                  * Handle mouse button release event.
                  */
                 handleMouseUp = function (evt) {
+                    
+                    updateMatrix();
+
                     if (evt.preventDefault) {
                         evt.preventDefault();
                     }

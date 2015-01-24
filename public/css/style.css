@@ -36,6 +36,7 @@ rect {
     width: 300px;
     padding: 20px;
     margin-top:50px;
+    border-left: 4px solid #5A6F5B;
 }
 
 #cropContainerHeader {
@@ -118,5 +119,11 @@ rect {
     padding:0;
     margin: 50px auto 0 auto;
     height:calc(100vh - 50px)
+}
+
+.editBar {
+    position: absolute;
+    top: 50px;
+    padding: 0 10px;
 }
 		
