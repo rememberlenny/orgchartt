@@ -1,11 +1,14 @@
 var express = require('express'),
 	mongoose = require('mongoose'),
   bodyParser = require('body-parser'),
-  fs = require('fs');
+  fs = require('fs'),
+  dotenv = require('dotenv');
+
+dotenv.load();
 
 var app = express()
 
-mongoose.connect('mongodb://admin:WoofyDog54@ds031571.mongolab.com:31571/heroku_app33449780');
+mongoose.connect(process.env.MONGOURL);
 
 
 app.use(express.static(__dirname + '/public'));
@@ -15,7 +18,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 })); 
 app.use(bodyParser.json());
 
-var server = app.listen(process.env.PORT || 5000, function () {
+var server = app.listen(process.env.PORT || 4000, function () {
 
   var host = server.address().address
   var port = server.address().port
