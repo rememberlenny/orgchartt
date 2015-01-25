@@ -4,7 +4,6 @@ var editMode = false,
   updateBoxes;
 
 function updateMatrix() { //store the latest viewport transform after drag or zoom
-
   var lastTransform = $('#viewport').attr('transform');
   viewData.translation = lastTransform;
   console.log(viewData);
@@ -12,22 +11,11 @@ function updateMatrix() { //store the latest viewport transform after drag or zo
 
 $(document).ready(function() {
 
-
-
-  // $('#editButton').click(function(){
-  //   editMode = true;
-  //   var scope = angular.element(document.getElementById("viewController")).scope();
-  //   scope.$apply(function() {
-  //     scope.editMode = true;
-  //   });
-  // });
-
-
-  $.getJSON('nyc/api/view',function(res){
+  $.getJSON('nyc/api/view',function(res){ //get the stored view settings
   
   viewData = res;
 
-  var svg = d3.select(".container-fluid")
+  var svg = d3.select(".container-fluid")  //create svg
     .append("svg")
     .attr("width", '100%')
     .attr("height", '100%')
@@ -38,25 +26,12 @@ $(document).ready(function() {
         })
     });
 
-
-
-  var group = svg.append("g")
+  var group = svg.append("g") //append g
     .attr("id", "viewport")
     .attr("transform",viewData.translation);
 
   var rectangleRadius = 5;
 
-
-  //listen for save, push view to server
-  $('.saveButton').click(function(){
-    console.log(viewData);
-    $.ajax({
-      url: '/nyc/api/view/',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(viewData)
-    })
-  });
 
   d3.json('/nyc/api/boxes', function(data) {
 
@@ -111,9 +86,10 @@ $(document).ready(function() {
       }
     }
 
+    updateBoxes = function(){  //draw boxes from data
+      group.selectAll("g").remove();
 
-
-    updateBoxes = function(){
+      console.log("updateBoxes()")
       var boxes = group.selectAll("g")
         .data(boxData)
         .enter()
@@ -122,7 +98,7 @@ $(document).ready(function() {
           return "translate(" + d.x + "," + d.y + ")";
         })
         .attr("class", "box")
-        .on("click", function(d) {
+        .on("click", function(d) { //send underlying box data to angular
 
           var scope = angular.element(document.getElementById(
             "form")).scope();
@@ -202,23 +178,14 @@ $(document).ready(function() {
         .attr("y", -11);
     }
     updateBoxes();
-
-
-
-
-
-
   });
 
-
-
+  //jquery-svgpan thanks to John Krauss
   var enablePan = true;
   var enableDrag = true;
   $('svg').svgPan('viewport', enablePan, enableDrag);
        
   })
-
-
 });
 
 //Load angular controllers outside of document.ready();
@@ -269,6 +236,7 @@ var boxController = function($scope) {
         data: JSON.stringify($scope.box)
       })
     }
+    updateBoxes();
   };
 
   $scope.delete = function() {
@@ -280,8 +248,21 @@ var boxController = function($scope) {
     })
   };
 
+  //Listeners
+
   $('#imageButton').click(function() {
     $('#imagePop').show();
+  });
+
+    //listen for save, push view to server
+  $('.saveButton').click(function(){
+    console.log(viewData);
+    $.ajax({
+      url: '/nyc/api/view/',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(viewData)
+    })
   });
 
 
@@ -331,9 +312,4 @@ var boxController = function($scope) {
   $('#btnZoomOut').on('click', function() {
     cropper.zoomOut();
   })
-
-
-
-
-
 }
