@@ -63,7 +63,7 @@
         <button  class="btn btn-primary navbar-btn" ng-click="newBox()">
             New Box
         </button>
-        <button  class="btn btn-primary navbar-btn" >
+        <button ng-class="lineToolActive ? 'btn btn-primary navbar-btn saveButton' : 'btn btn-default navbar-btn saveButton'" ng-click="lineToolActive=!lineToolActive">
             Line Tool
         </button>
     </div>

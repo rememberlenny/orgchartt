@@ -6,28 +6,25 @@ var express = require('express'),
 
 dotenv.load();
 
-var app = express()
+var app = express();
 
 mongoose.connect(process.env.MONGOURL);
 
-
 app.use(express.static(__dirname + '/public'));
-app.use( bodyParser.json() ); 
+app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
 app.use(bodyParser.json());
 
 var server = app.listen(process.env.PORT || 4000, function () {
-
   var host = server.address().address
   var port = server.address().port
 
   console.log('Example app listening at http://%s:%s', host, port)
+});
 
-})
-
-//CREATE
+//CREATE box
 app.post('/nyc/api/boxes/',function (req, res) {
   console.log(req.body);
   var thisBox = req.body;
@@ -42,7 +39,7 @@ app.post('/nyc/api/boxes/',function (req, res) {
   });
 });
 
-//READ
+//READ box
 app.get('/nyc/api/boxes', function (req, res) {
   return BoxModel.find(function (err,boxes) {
     if (!err) {
@@ -51,10 +48,9 @@ app.get('/nyc/api/boxes', function (req, res) {
       return console.log(err);
     }
   });
-})
+});
 
-
-//UPDATE
+//UPDATE box
 app.post('/nyc/api/boxes/:id',function (req, res) {
   console.log(req.body);
   var thisBox = req.body;
@@ -68,7 +64,7 @@ app.post('/nyc/api/boxes/:id',function (req, res) {
   });
 });
 
-//DELETE
+//DELETE box
 app.delete('/nyc/api/boxes/:id',function (req, res) {
   
   BoxModel.remove({_id: req.params.id}, function(err) {

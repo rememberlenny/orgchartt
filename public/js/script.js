@@ -1,7 +1,17 @@
 var editMode = false,
   viewData,
   boxData,
-  updateBoxes;
+  updateBoxes,
+  lineToolActive = false,
+  enablePan,
+  enableDrag;
+
+var lineFunction = d3.svg.line() //function used for drawing lines
+                  .x(function(d) { return d.x; })
+                  .y(function(d) { return d.y; })
+                  .interpolate("linear");
+
+
 
 function updateMatrix() { //store the latest viewport transform after drag or zoom
   var lastTransform = $('#viewport').attr('transform');
@@ -19,12 +29,33 @@ $(document).ready(function() {
     .append("svg")
     .attr("width", '100%')
     .attr("height", '100%')
-    .call(function() {
-      var bgDrag = d3.behavior.drag()
-        .on("drag", function() {
-          console.log('drag');
-        })
-    });
+    .on('mousedown', mousedown);
+  
+  function mousedown() {  //All of this live line drawing stuff is from: http://stackoverflow.com/questions/18273884/live-drawing-of-a-line-in-d3-js
+    console.log("mousedown");
+    m = d3.mouse(this);
+    console.log(m);
+    line = svg.append("line")
+      .attr("x1", m[0])
+      .attr("y1", m[1])
+      .attr("x2", m[0])
+      .attr("y2", m[1])
+      .attr({'stroke': 'purple', 'stroke-width': 5, 'fill': 'none'})
+      //.call(drag);
+    svg.on("mousemove", mousemove)
+      .on("mouseup", mouseup);
+  }
+
+  function mousemove() {
+    console.log("mousemove");
+    var m = d3.mouse(this);
+    line.attr("x2", m[0])
+        .attr("y2", m[1]);
+  }
+
+  function mouseup() {
+    svg.on("mousemove", null);
+  }
 
   var group = svg.append("g") //append g
     .attr("id", "viewport")
@@ -77,7 +108,7 @@ $(document).ready(function() {
       
 
     function dragmove(d) {
-      if(editMode) {
+      if (editMode) {
         var x = d3.event.x;
         var y = d3.event.y;
         d3.select(this).attr("transform", function(d) {
@@ -181,8 +212,8 @@ $(document).ready(function() {
   });
 
   //jquery-svgpan thanks to John Krauss
-  var enablePan = true;
-  var enableDrag = true;
+  enablePan = true;
+  enableDrag = true;
   $('svg').svgPan('viewport', enablePan, enableDrag);
        
   })
@@ -192,11 +223,20 @@ $(document).ready(function() {
 
 var viewController = function($scope) {
   $scope.editMode = false;
+  $scope.lineToolActive = false;
 
   //set global editMode based on angular editMode
   $scope.$watch('editMode', function() {
     $scope.editMode ? editMode = true : editMode = false;
     console.log(editMode);
+  });
+
+  //set global lineToolActive based on angular lineToolActive
+  $scope.$watch('lineToolActive', function() {
+    $scope.lineToolActive ? lineToolActive = true : lineToolActive = false;
+    $scope.lineToolActive ? enablePan = false : enablePan = true;
+    $('svg').svgPan('viewport', enablePan, enableDrag);
+    console.log(lineToolActive);
   });
 
   $scope.newBox = function(){
@@ -212,6 +252,8 @@ var viewController = function($scope) {
       boxData.push(emptyBox);
       updateBoxes();
   };
+
+
 }
 
 var boxController = function($scope) {
@@ -249,6 +291,8 @@ var boxController = function($scope) {
   };
 
   //Listeners
+  
+
 
   $('#imageButton').click(function() {
     $('#imagePop').show();

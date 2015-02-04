@@ -234,23 +234,26 @@
                         evt.preventDefault();
                     }
 
-                    evt.returnValue = false;
+                    if (!lineToolActive) {
 
-                    var g = svgRoot,
-                        p;
+                      evt.returnValue = false;
 
-                    if (state === PAN && enablePan) {
-                        // Pan mode
-                        p = getEventPoint(evt).matrixTransform(stateTf);
+                      var g = svgRoot,
+                          p;
 
-                        setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
-                    } else if (state === DRAG && enableDrag) {
-                        // Drag mode
-                        p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
+                      if (state === PAN && enablePan) {
+                          // Pan mode
+                          p = getEventPoint(evt).matrixTransform(stateTf);
 
-                        setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
+                          setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
+                      } else if (state === DRAG && enableDrag) {
+                          // Drag mode
+                          p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
 
-                        stateOrigin = p;
+                          setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
+
+                          stateOrigin = p;
+                      }
                     }
                 },
 
